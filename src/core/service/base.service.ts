@@ -1,8 +1,11 @@
+import { Injectable } from '@nestjs/common';
 import { BetaModel } from 'core/entities';
 import { unlink } from 'fs/promises';
 import { Repository } from 'typeorm';
+import { CoreService } from './core.service';
 
-export class BaseService {
+// @Injectable()
+export class BaseService extends CoreService {
   public repo: Repository<BetaModel>;
   findAll() {
     return this.repo.find() || { message: `record does not exsist` };
@@ -26,7 +29,7 @@ export class BaseService {
     // return this.repo.delete(id);
     return this.repo.delete({ id });
   }
-  delFile(filename: string){
+  delFile(filename: string) {
     return unlink('public/' + filename).catch(console.log);
   }
 }

@@ -1,34 +1,57 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Param,
+  Patch,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { Public } from 'core/decorators';
+import { InterceptorImage } from 'core/interceptor';
+import { unlink } from 'fs/promises';
+import { UpdateLawyerDto } from './dto/lawyer.dto';
 import { LawyerService } from './lawyer.service';
-import { CreateLawyerDto } from './dto/create-lawyer.dto';
-import { UpdateLawyerDto } from './dto/update-lawyer.dto';
 
 @Controller('lawyer')
+@ApiTags('lawyer')
 export class LawyerController {
-  constructor(private readonly lawyerService: LawyerService) {}
+  constructor(private readonly _ss: LawyerService) {}
+  @Patch()
+  @UseInterceptors(InterceptorImage)
+  async update(
+    @Body() body: UpdateLawyerDto,
+    @Param('id') id: number,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
+    const result = await this._ss.repo.findOneBy({ id });
+    if (!result)
+      throw new HttpException(
+        `${{ id }} does not exsist`,
+        HttpStatus.NOT_FOUND,
+      );
+    if (image) {
+      await unlink('public/' + result?.user?.image);
+      body.image = image.filename;
+    }
 
-  @Post()
-  createTeam(@Body() createLawyerDto: CreateLawyerDto) {
-    return this.lawyerService.create(createLawyerDto);
+    return this._ss.update(id, body, result);
   }
 
+  @Public()
   @Get()
-  findAll() {
-    return this.lawyerService.findAll();
+  getAll() {
+    return this._ss.getAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.lawyerService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLawyerDto: UpdateLawyerDto) {
-    return this.lawyerService.update(+id, updateLawyerDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.lawyerService.remove(+id);
+  @Public()
+  @Get('city_specialization')
+  lawyerByCity_Speciality(@Query() { cityId, specializationId }) {
+    return this._ss.lawyerByCity_Speciality(cityId, specializationId);
   }
 }

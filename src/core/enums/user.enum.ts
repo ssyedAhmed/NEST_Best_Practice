@@ -1,6 +1,7 @@
 export enum GENDER {
   MALE = 'male',
   FEMALE = 'female',
+  NONE = 'None',
 }
 
 export enum ROLE {
@@ -8,7 +9,7 @@ export enum ROLE {
   LAWYER = 'Lawyer',
   TEAM = 'Team',
   CLIENT_APPONITMENT = 'Client Appointment', // Clients that are approaching lawyer for cases
-  CLIENT_LAWYER = "Client Lawyer" // Personel Clients
+  CLIENT_LAWYER = 'Client Lawyer', // Personel Clients
 
   // USER = 'User',
 }
@@ -25,14 +26,24 @@ export enum ROLE {
 //   SUPREME = 'Supreme Court',
 // }
 
-
 // Lawyer Status
 export enum STATUS {
-  NONE = 'NONE', // APPONTMENT_CLIENT, LAWYER_CLIENT, 
+  NONE = 'None', // APPONTMENT_CLIENT, LAWYER_CLIENT,
   ACTIVE = 'Active',
   REJECT = 'Reject',
   PENDING = 'Pending', // LAWYER DEFAULT
   BLOCK = 'Block',
+}
+
+// Appointment Status
+export enum STATUS_APPOINT {
+  // Admin
+  PENDING = 'Pending',
+  DIRECT = 'Direct',
+  CANCEL = 'Cancel',
+  // Lawyer
+  ACCEPT = 'Accept',
+  REJECT = 'Reject',
 }
 
 // Lawyer Team

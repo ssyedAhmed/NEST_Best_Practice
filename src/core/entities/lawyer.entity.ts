@@ -1,33 +1,62 @@
-import { Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn} from "typeorm";
-import { Court } from "./court.entity";
-import { Specialization } from "./specialization.entity";
-import { User } from "./user.entity";
-
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
+import {
+  User,
+  Court,
+  Specialization,
+  LawyerTeam,
+  LawyerClient,
+  Task,
+  Appoinment,
+  AlphaModel,
+} from './index';
 
 @Entity()
-export class Lawyer {
-  
-  @PrimaryGeneratedColumn()
-  id: number;
+export class Lawyer extends AlphaModel {
+  @ManyToOne(() => User, (x) => x.lawyer, { eager: true, cascade: true })
+  @JoinColumn({ foreignKeyConstraintName: 'fk_user_lawyer' })
+  user?: User;
 
+  @Column()
+  userId?: number;
 
-  @ManyToOne(() => Specialization, e => e.lawyers)
-  specialization: Specialization;
+  @ManyToOne(() => Specialization, (e) => e.lawyers, { eager: true })
+  @JoinColumn({
+    foreignKeyConstraintName: 'fk_specialization_user',
+  })
+  specialization?: Specialization;
 
-  @JoinColumn({ foreignKeyConstraintName: 'fk_specialization_user', referencedColumnName:'id' })
-  specializationId: number;
+  @Column()
+  specializationId?: number;
 
-  @ManyToMany(() => Court, c => c.lawyer, {
+  @ManyToMany(() => Court, (c) => c.lawyer, {
     eager: true,
   })
-  @JoinTable({ name: 'court_lawyer' })
-  court: Court[];
+  @JoinTable({
+    name: 'court_lawyer',
+    joinColumn: { foreignKeyConstraintName: 'fk_lawyer_court' },
+  })
+  court?: Court[];
 
+  // courtIds?: number[]; // It cannot be used in any case
 
-  @OneToOne(() => User, x => x.lawyer, { eager: true, cascade: true })
-  user: User;
-  
-  @JoinColumn({ foreignKeyConstraintName: 'fk_user_lawyer' })
-  userId: number;
+  @OneToMany(() => LawyerTeam, (x) => x.lawyer)
+  lawyerTeam?: LawyerTeam[];
+
+  @OneToMany(() => LawyerClient, (x) => x.lawyer)
+  lawyerClient?: LawyerClient[];
+
+  @OneToMany(() => Task, (x) => x.lawyer)
+  task?: Task[];
+
+  @OneToOne(() => Appoinment, (x) => x.lawyer)
+  appointment?: Appoinment;
 }
-
